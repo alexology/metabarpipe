@@ -1,0 +1,43 @@
+Package: metabarpipe
+Type: Package
+Title: A metabarcoding pipeline for Windows
+Version: 0.1.0
+Authors@R: 
+    c(person(given = "Alex",
+             family = "Laini",
+             role = c("aut", "cre"),
+             email = "alex.laini@gmail.com",
+             comment = c(ORCID = "0000-0002-3458-7538")),
+             person(given = "Laura",
+             family = "Gruppuso",
+             role = c("aut"),
+             email = "laura.gruppuso@unito.it",
+             comment = c(ORCID = "0000-0001-5627-5423")),
+             person(given = "Samuele",
+             family = "Voyron",
+             role = c("aut"),
+             email = "samuele.voyron@unito.it",
+             comment = c(ORCID = "0000-0001-6921-9519")))
+Description: An organized pipeline for Windows that leverage on vsearch and cutadapt.
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
+Imports: 
+    Biostrings,
+    bold,
+    curl,
+    dada2,
+    DECIPHER,
+    dplyr,
+    httr,
+    kableExtra,
+    knitr,
+    magrittr,
+    readxl,
+    R.utils,
+    ShortRead,
+    tibble,
+    tidyr,
+    writexl,
+    xml2
