@@ -124,7 +124,7 @@ swarm <- function(asv_folder = "13_taxonomic_assignment",
                      sep = "")
   
   writexl::write_xlsx(x = asv_table_swarm_def,
-                      path = file_name) 
+                      path = file.path(out_dir, file_name)) 
 
   asv_table_swarm_def
 }
