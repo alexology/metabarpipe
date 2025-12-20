@@ -30,7 +30,7 @@ in both r1 and r2.}
 \item{n_reads}{The number of reads above which a fastq is kept for further processing.}
 }
 \value{
-The function `r1_r2_checker` returns TRUE if all the r1 files are matched by
+The function `names_checker` returns TRUE if all the r1 files are matched by
 files in r2, otherwise FALSE. If \code{return_fastq_names} is set to \code{TRUE},
 the function returns a list of r1 and r2 fastq.
 }

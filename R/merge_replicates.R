@@ -7,7 +7,8 @@
 #' @param asv_table Can be \code{chimera_removed} for the asv_table generated after
 #' chimera removal or \code{chimera} for the asv_table generated after protein translation.
 #' @param pattern The pattern to remove. See details.
-#' @param percentage_to_remove Remove ASV with a relative abundance lower than this threshold.
+#' @param colsums_percentage Set to 0 ASV with a relative abundance (calculated over a sample) lower than this threshold.
+#' @param rowsums_percentage Remove ASV with a relative abundance (calculated over an ASV) lower than this threshold.
 #'
 #' @details
 #' Replicates of the same sample are usually stored with the name of the sample and
@@ -20,14 +21,13 @@
 #' @importFrom tibble column_to_rownames rownames_to_column as_tibble
 #' @importFrom dplyr mutate group_by
 #' @importFrom writexl write_xlsx
-
-
-
+#' @importFrom rlang .data
 
 merge_replicates <- function(project_path = NULL,
                              asv_table = "translated",
                              pattern = "_replicate",
-                             percentage_to_remove = 0){
+                             colsums_percentage = 0,
+                             rowsums_percentage = 0){
 
   if(identical(asv_table, "translated")){
     asv_table <- file.path(project_path, "11_translation", "asv_table_translated.xlsx") %>%
@@ -47,31 +47,67 @@ merge_replicates <- function(project_path = NULL,
     t() %>%
     as.data.frame()
 
-  # calculate the relative abundance of each ASV
-  merged_table_percentage <- merged_table %>%
-    sweep(., 1, apply(., 1, sum), "/") * 100
+  if(colsums_percentage > 0 & rowsums_percentage == 0){
+    # calculate the relative abundance of each ASV
+    merged_table_percentage <- sweep(merged_table, 1, apply(merged_table, 1, sum), "/") * 100
+    
+    # set ASV with abundance lower than a threshold to 0
+    merged_table_percentage[merged_table_percentage < colsums_percentage] <- 0
+    merged_table_percentage[merged_table_percentage >= colsums_percentage] <- 1
+    
+    # remove ASV below the threshold
+    merged_table <- merged_table * merged_table_percentage
+  }
 
-  # set ASV with abundance lower than a threshold to 0
-  merged_table_percentage[merged_table_percentage < percentage_to_remove] <- 0
-  merged_table_percentage[merged_table_percentage >= percentage_to_remove] <- 1
+  if(colsums_percentage == 0 & rowsums_percentage > 0){
+    # calculate the relative abundance of each ASV
+    merged_table_percentage <- sweep(merged_table, 2, apply(merged_table, 2, sum), "/") * 100
+    
+    # set ASV with abundance lower than a threshold to 0
+    merged_table_percentage[merged_table_percentage < rowsums_percentage] <- 0
+    merged_table_percentage[merged_table_percentage >= rowsums_percentage] <- 1
+    
+    # remove ASV below the threshold
+    merged_table <- merged_table * merged_table_percentage
+  }
+  
+  if(colsums_percentage > 0 & rowsums_percentage > 0){
+    # calculate the relative abundance of each ASV
+    merged_table_percentage_col <- sweep(merged_table, 1, apply(merged_table, 1, sum), "/") * 100
+    
+    # calculate the relative abundance of each ASV
+    merged_table_percentage_row <- sweep(merged_table, 2, apply(merged_table, 2, sum), "/") * 100
+    
+    # set ASV with abundance lower than a threshold to 0
+    merged_table_percentage_col[merged_table_percentage_col < colsums_percentage] <- 0
+    merged_table_percentage_col[merged_table_percentage_col >= colsums_percentage] <- 1
+    
+    # set ASV with abundance lower than a threshold to 0
+    merged_table_percentage_row[merged_table_percentage_row < rowsums_percentage] <- 0
+    merged_table_percentage_row[merged_table_percentage_row >= rowsums_percentage] <- 1
+    
+    # remove ASV below the threshold
+    merged_table <- merged_table * merged_table_percentage_col * merged_table_percentage_row
+  }
+  
 
-
-  # remove ASV below the threshold
-  merged_table <- merged_table * merged_table_percentage
-
+    
   # prepare merged table for saving
   merged_table <- merged_table %>%
     tibble::rownames_to_column("samples") %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(samples = gsub(paste(pattern, ".", sep = ""), "", samples)) %>%
-    dplyr::group_by(samples) %>%
+    tibble::as_tibble()
+  
+  # to avoid R CMD issues
+  merged_table$samples <- gsub(paste(pattern, ".", sep = ""), "", merged_table$samples)
+  
+  # to avoid R CMD issues
+  merged_table <- merged_table %>%
+    dplyr::group_by(.data$samples) %>%
     dplyr::summarise_all(function(...)if(all(...> 0)){sum(...)} else {0}) %>%
     as.data.frame() %>%
     tibble::column_to_rownames("samples") %>%
     t() %>%
     as.data.frame()
-
-
 
   # remove empty rows
   merged_table <- merged_table[rowSums(merged_table) > 0,] %>%
@@ -81,6 +117,4 @@ merge_replicates <- function(project_path = NULL,
   # save to disk
   writexl::write_xlsx(merged_table,
                       file.path(project_path, "12_results", "asv_table_replicate_merged.xlsx"))
-
-
 }

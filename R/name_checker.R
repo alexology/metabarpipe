@@ -21,9 +21,11 @@
 #'
 #' @importFrom dplyr filter pull rename
 #' @importFrom readxl read_excel
+#' @importFrom stats na.omit
+#' @importFrom rlang .data
 #'
 #' @returns
-#' The function `r1_r2_checker` returns TRUE if all the r1 files are matched by
+#' The function `names_checker` returns TRUE if all the r1 files are matched by
 #' files in r2, otherwise FALSE. If \code{return_fastq_names} is set to \code{TRUE},
 #' the function returns a list of r1 and r2 fastq.
 
@@ -75,10 +77,10 @@ names_checker <- function(project_path = NULL,
 
       to_keep <- read_count_df[, to_subset] %>%
           na.omit() %>%
-          dplyr::rename(r1 = 2, r2 = 3) %>%
-          dplyr::filter(samples_name %in% reads_intersect) %>%
-          dplyr::filter((r1 > n_reads) & (r2 > n_reads)) %>%
-          pull(samples_name)
+          dplyr::rename("r1" = 2, "r2" = 3) %>%
+          dplyr::filter(.data$samples_name %in% reads_intersect) %>%
+          dplyr::filter((.data$r1 > n_reads) & (.data$r2 > n_reads)) %>%
+          pull("samples_name")
 
 
       if(length(to_keep) == 0){
@@ -117,9 +119,9 @@ names_checker <- function(project_path = NULL,
 
     to_keep <- read_count_df[, to_subset] %>%
       na.omit() %>%
-      dplyr::rename(r1 = 2) %>%
-      dplyr::filter(r1 > n_reads) %>%
-      dplyr::pull(samples_name)
+      dplyr::rename("r1" = 2) %>%
+      dplyr::filter(.data$r1 > n_reads) %>%
+      dplyr::pull("samples_name")
 
 
     if(length(to_keep) == 0){

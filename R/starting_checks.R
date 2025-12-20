@@ -75,16 +75,20 @@ starting_checks <- function(project_path = NULL,
     # get the IDs without the last part for r1
     id_r1_temp <- subset_r1@id %>%
       as.character() %>%
-      strsplit(., " ") %>%
-      do.call(rbind, .) %>%
+      strsplit(" ")
+    
+    # to avid R CMD checks  
+    id_r1_temp  <- do.call(rbind, id_r1_temp) %>%
       as.data.frame() %>%
       dplyr::select(1)
 
     # get the IDs without the last part for r2
     id_r2_temp <- subset_r2@id  %>%
       as.character() %>%
-      strsplit(., " ") %>%
-      do.call(rbind, .) %>%
+      strsplit(" ")
+    
+    # to avid R CMD checks
+    id_r2_temp <- do.call(rbind, id_r2_temp) %>%
       as.data.frame() %>%
       dplyr::select(1)
 

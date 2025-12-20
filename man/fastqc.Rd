@@ -23,4 +23,6 @@ This function is a wrapper of the software FASTQC.
 \details{
 The function \code{fastqc} uses the program fastqc to do some quality control checks.
 The fastqc program is available at \url{https://www.bioinformatics.babraham.ac.uk/projects/fastqc/}.
+This function requires Java and FastQC to be installed and accessible.
+Java must be available on the system PATH.
 }

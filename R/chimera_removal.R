@@ -45,7 +45,7 @@ remove_chimera <-  function(project_path,
                            file_folder = "8_denoising",
                            return_fastq_names = TRUE,
                            n_reads = n_reads) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
   # select cutadapt files with grepl
   fasta_dnoise <- fasta_dnoise[grepl(to_keep,  fasta_dnoise)] %>%
@@ -131,10 +131,8 @@ remove_chimera <-  function(project_path,
       next()
     } else {
       
-      read_count_chimera[i, 2] <- bio_upload   %>%
-        names() %>%
-        strsplit(., "=") %>%
-        do.call(rbind, .) %>%
+      read_count_chimera_temp <- strsplit(names(bio_upload), "=")
+      read_count_chimera[i, 2] <- do.call(rbind, read_count_chimera_temp) %>%
         as.data.frame() %>%
         dplyr::pull(2) %>%
         as.numeric() %>%
@@ -164,11 +162,11 @@ remove_chimera <-  function(project_path,
     # remove columns with dplyr
     read_count_df %>%
       dplyr::select(-dplyr::any_of(col_to_remove)) %>%
-      dplyr::left_join(., read_count_chimera, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_chimera, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df %>%
-      dplyr::left_join(., read_count_chimera, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_chimera, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
 }

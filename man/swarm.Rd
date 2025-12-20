@@ -5,7 +5,8 @@
 \title{OTU clustering with swarm}
 \usage{
 swarm(
-  asv_table = NULL,
+  asv_folder = "13_taxonomic_assignment",
+  project_path = NULL,
   swarm_path = NULL,
   param_d = 13,
   param_t = 4,
@@ -13,7 +14,9 @@ swarm(
 )
 }
 \arguments{
-\item{asv_table}{ASV table.}
+\item{asv_folder}{Path to the folder with ASV results.}
+
+\item{project_path}{Path to the project folder.}
 
 \item{swarm_path}{Path to swarm.}
 

@@ -15,11 +15,12 @@
 #' 
 #'
 #' @importFrom readxl read_excel
-#' @importFrom dplyr select filter inner_join pull
+#' @importFrom dplyr all_of select filter inner_join pull
 #' @importFrom tidyr unite separate
 #' @importFrom Biostrings readDNAStringSet
 #' @importFrom writexl write_xlsx
-#' @importFrom tibble as_tibble
+#' @importFrom tibble as_tibble rownames_to_column
+#' @importFrom rlang .data
 
 
 
@@ -59,30 +60,30 @@ taxonomic_assignment <- function(project_path = NULL,
                                                             "13_taxonomic_assignment",
                                                             "boldigger.fasta")) %>%
     as.data.frame() %>%
-    dplyr::rename(ASV = 1) %>%
+    dplyr::rename("ASV" = 1) %>%
     tibble::rownames_to_column("id") %>%
-    dplyr::inner_join(., boldigger_results, by = "id") %>%
-    dplyr::select(-id) %>%
+    dplyr::inner_join(boldigger_results, by = "id") %>%
+    dplyr::select(-c("id") ) %>%
     tibble::as_tibble()
   
   if(isTRUE(remove_bad_names)){
     boldigger_results <- boldigger_results %>%
-      dplyr::filter(!grepl("cf.", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl("sp.", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl("sp.", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl("sp.", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl("/", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl("no-match", species, fixed = TRUE)) %>%
-      dplyr::filter(!grepl(".*[0-9].*", species)) 
+      dplyr::filter(!grepl("cf.", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl("sp.", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl("sp.", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl("sp.", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl("/", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl("no-match", .data$species, fixed = TRUE)) %>%
+      dplyr::filter(!grepl(".*[0-9].*", .data$species)) 
     
   }
   
   if(isTRUE(species_only)){
     boldigger_results <- boldigger_results %>%
-      dplyr::filter(countSpaces(species) == 1) %>%
-      dplyr::filter(species != "") %>%
-      dplyr::filter(!is.na(species)) %>%
-      dplyr::filter(!is.na(genus))
+      dplyr::filter(countSpaces(.data$species) == 1) %>%
+      dplyr::filter(.data$species != "") %>%
+      dplyr::filter(!is.na(.data$species)) %>%
+      dplyr::filter(!is.na(.data$genus))
   } 
 
   if(is.null(filter_taxlev) & !is.null(filter_taxa)){
@@ -97,13 +98,15 @@ taxonomic_assignment <- function(project_path = NULL,
       stop("filter_taxa cannot be NULL when filter_taxlev is not NULL")
     }
     
-    # subeset a taxon as requested by the user
-    boldigger_results <- boldigger_results[dplyr::pull(boldigger_results[, filter_taxlev]) %in% filter_taxa,]
+    # subset a taxon as requested by the user
+    #boldigger_results <- boldigger_results[dplyr::pull(boldigger_results[, filter_taxlev]) %in% filter_taxa,]
+    boldigger_results <- boldigger_results %>%
+      dplyr::filter(.data[[filter_taxlev]] %in% filter_taxa)
   }
   
   boldigger_results <- boldigger_results %>%
-    dplyr::select(ASV:species) %>%
-    dplyr::inner_join(., asv_file, by = "ASV")
+    dplyr::select(dplyr::all_of("ASV"):dplyr::all_of("species")) %>%
+    dplyr::inner_join(asv_file, by = "ASV")
   
   # set the name of the output to keep trace of the calculations
   file_name <- c("")

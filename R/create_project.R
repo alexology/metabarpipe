@@ -37,8 +37,7 @@ create_project <- function(project_path){
                "10_asv_table",
                "11_translation",
                "12_results",
-               "13_taxonomic_assignment",
-               "14_aaplotype_filtering")
+               "13_taxonomic_assignment")
 
   # create folders
   lapply(folders, function(x) dir.create(file.path(project_path, x), showWarnings = FALSE))

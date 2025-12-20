@@ -103,8 +103,7 @@ primer_orientation <- function(project_path = NULL,
     as.data.frame() %>%
     tibble::rownames_to_column("sample") %>%
     tibble::as_tibble()  %>%
-    writexl::write_xlsx(x = .,
-                        file.path(project_path,
+    writexl::write_xlsx(file.path(project_path,
                                   "log_files",
                                   "2_primer_count_original_fastq_R1.xlsx"))
 
@@ -115,9 +114,9 @@ primer_orientation <- function(project_path = NULL,
     as.data.frame() %>%
     tibble::rownames_to_column("sample") %>%
     tibble::as_tibble()  %>%
-    writexl::write_xlsx(x = .,
-                        file.path(project_path,
-                                  "log_files", "2_primer_count_original_fastq_R2.xlsx"))
+    writexl::write_xlsx(file.path(project_path,
+                                  "log_files",
+                                  "2_primer_count_original_fastq_R2.xlsx"))
 
 
 }

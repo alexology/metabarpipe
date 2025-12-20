@@ -5,6 +5,7 @@
 #'
 #' @param project_path The path to the project folder.
 #' @param vsearch_path The path to \code{vsearch} folder.
+#' @param output_path The path were saving the results.
 #' @param max_ee From \code{vsearch}: "...discard sequences with more than the specified number of expected errors"
 #' @param qmax From \code{vsearch}: "...the maximum quality score accepted when reading FASTQ files. Default to 41."
 #' @param vsearch_arguments Further arguments to be passed to \code{vsearch}.
@@ -46,7 +47,7 @@ filter_by_quality <- function(project_path = NULL,
                            file_folder = "5_marker_length_filtering",
                            return_fastq_names = TRUE,
                            n_reads = n_reads) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
   # select cutadapt files with grepl
   fastq_trimmed <- fastq_trimmed[grepl(to_keep,  fastq_trimmed)] %>%
@@ -112,9 +113,6 @@ filter_by_quality <- function(project_path = NULL,
                   col.names = FALSE)
     }
 
-
-
-
     file.append(file.path(output_path, "log_files", "6_quality_filtering.txt"),
                 file.path(output_path, "log_files", "header_primers.txt"))
 
@@ -168,11 +166,11 @@ filter_by_quality <- function(project_path = NULL,
     # remove columns with dplyr
     read_count_df %>%
       dplyr::select(-dplyr::any_of(col_to_remove)) %>%
-      dplyr::left_join(., read_count_ee, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(output_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_ee, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(output_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df %>%
-      dplyr::left_join(., read_count_ee, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(output_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_ee, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(output_path, "log_files", "0_read_count.xlsx"))
     }
 }

@@ -15,9 +15,10 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr pull left_join
+#' @importFrom dplyr any_of pull left_join select
 #' @importFrom writexl write_xlsx
 #' @importFrom Biostrings readDNAStringSet
+#' @importFrom readxl read_excel
 
 
 dereplicate <- function(project_path = NULL,
@@ -44,7 +45,7 @@ dereplicate <- function(project_path = NULL,
                            file_folder = "6_quality_filtering",
                            return_fastq_names = TRUE,
                            n_reads = n_reads) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
 
 
@@ -122,12 +123,10 @@ dereplicate <- function(project_path = NULL,
 
     # populate the read counts file
     read_count_derep[i, 1] <- gsub("_derep.fasta", "", basename(fasta_derep[i]))
-    read_count_derep[i, 2] <-   Biostrings::readDNAStringSet(fasta_derep[i]) %>%
+    read_count_derep[i, 2] <- Biostrings::readDNAStringSet(fasta_derep[i]) %>%
       names() %>%
-      strsplit(., "=") %>%
-      do.call(rbind, .) %>%
-      as.data.frame() %>%
-      dplyr::pull(2) %>%
+      strsplit("=", fixed = TRUE) %>%
+      purrr::map_chr(2) %>%
       as.numeric() %>%
       sum()
 
@@ -151,12 +150,12 @@ dereplicate <- function(project_path = NULL,
     # remove columns with dplyr
     read_count_df %>%
       dplyr::select(-dplyr::any_of(col_to_remove)) %>%
-      dplyr::left_join(., read_count_derep, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_derep, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df %>%
-      dplyr::left_join(., read_count_derep, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_derep, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
 
 }

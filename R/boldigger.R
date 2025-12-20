@@ -13,7 +13,6 @@
 #' 
 #' @importFrom Biostrings readDNAStringSet writeXStringSet
 #' @importFrom readxl read_excel
-#' 
 
 boldigger <- function(asv_folder = NULL,
                       project_path = NULL,
@@ -47,7 +46,7 @@ boldigger <- function(asv_folder = NULL,
   
   # create a Biostring obiect
   asv_bio <- asv_file %>%
-    dplyr::pull(ASV) %>%
+    dplyr::pull("ASV") %>%
     Biostrings::DNAStringSet()
   
   # give names to asv

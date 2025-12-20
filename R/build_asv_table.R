@@ -12,6 +12,7 @@
 #' @importFrom tidyr pivot_wider
 #' @importFrom writexl write_xlsx
 #' @importFrom Biostrings readDNAStringSet
+#' @importFrom rlang .data
 
 build_asv_table <- function(project_path = NULL){
 
@@ -36,11 +37,15 @@ build_asv_table <- function(project_path = NULL){
       next()
     } else {
       # get n_reads
-      temp_n_reads <- strsplit(names(temp_fasta), ";") %>%
-        do.call(rbind, .) %>%
+      temp_n_reads <- strsplit(names(temp_fasta), ";") 
+      
+      # to avoid no visible binding for global variable '.'
+      temp_n_reads <- do.call(rbind, temp_n_reads) %>%
         as.data.frame() %>%
-        dplyr::pull(2) %>%
-        gsub("size=", "", .) %>%
+        dplyr::pull(2) 
+      
+      # to avoid no visible binding for global variable '.'
+      temp_n_reads <- gsub("size=", "", temp_n_reads) %>%
         as.numeric()
       
       # create the data.frame
@@ -59,9 +64,9 @@ build_asv_table <- function(project_path = NULL){
   }
 
   wide_df <- dplyr::bind_rows(asv_list) %>%
-        tidyr::pivot_wider(id_cols = ASV,
-                names_from = sample,
-                values_from = n_reads,
+        tidyr::pivot_wider(id_cols = .data$ASV,
+                names_from = .data$sample,
+                values_from = .data$n_reads,
                 values_fill = 0,
                 values_fn = sum)
 

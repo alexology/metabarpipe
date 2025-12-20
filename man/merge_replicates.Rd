@@ -8,7 +8,8 @@ merge_replicates(
   project_path = NULL,
   asv_table = "translated",
   pattern = "_replicate",
-  percentage_to_remove = 0
+  colsums_percentage = 0,
+  rowsums_percentage = 0
 )
 }
 \arguments{
@@ -19,7 +20,9 @@ chimera removal or \code{chimera} for the asv_table generated after protein tran
 
 \item{pattern}{The pattern to remove. See details.}
 
-\item{percentage_to_remove}{Remove ASV with a relative abundance lower than this threshold.}
+\item{colsums_percentage}{Set to 0 ASV with a relative abundance (calculated over a sample) lower than this threshold.}
+
+\item{rowsums_percentage}{Remove ASV with a relative abundance (calculated over an ASV) lower than this threshold.}
 }
 \description{
 This function merge multiple replicates of the same sample.

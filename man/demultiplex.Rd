@@ -20,9 +20,11 @@ demultiplex(
 
 \item{r2}{Path to the multiplexed r2 file.}
 
-\item{Indices}{used.}
+\item{combinations}{Indices combinations.}
 
-\item{Output}{folder.}
+\item{indices}{Indices used.}
+
+\item{folder}{Output folder.}
 }
 \description{
 This function demultiplex multiplexed data-

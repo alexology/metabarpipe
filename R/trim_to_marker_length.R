@@ -39,7 +39,7 @@ trim_to_marker_length <- function(project_path = NULL,
                            file_folder = "4_cutadapt_trimmed",
                            return_fastq_names = TRUE,
                            n_reads = n_reads) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
 
   # select cutadapt files with grepl
@@ -80,12 +80,8 @@ trim_to_marker_length <- function(project_path = NULL,
                   col.names = FALSE)
     }
 
-
-
-
     file.append(file.path(project_path, "log_files", "5_trim_to_marker_length.txt"),
                 file.path(project_path, "log_files", "header_primers.txt"))
-
 
     # compose cutadapt command
     trim_cmd <- paste(fastq_cutadapt[i],
@@ -128,27 +124,18 @@ trim_to_marker_length <- function(project_path = NULL,
   # add read counts to the log file
   read_count_df <- readxl::read_excel(file.path(project_path, "log_files", "0_read_count.xlsx"))
 
-  # if("marker_trim" %in% colnames(read_count_df)){
-  #   read_count_df[, "marker_trim"] <- read_marker_trim[,"marker_trim"]
-  #   writexl::write_xlsx(read_count_df, file.path(project_path, "log_files", "0_read_count.xlsx"))
-  # } else{
-  #   read_count_df  %>%
-  #     dplyr::left_join(., read_marker_trim, by = "samples_name") %>%
-  #     writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
-  # }
-  
     if("marker_trim" %in% colnames(read_count_df)){
     col_to_remove <- colnames(read_count_df)[which(colnames(read_count_df) == "marker_trim"):ncol(read_count_df)]
     
     # remove columns with dplyr
     read_count_df %>%
       dplyr::select(-dplyr::any_of(col_to_remove)) %>%
-      dplyr::left_join(., read_marker_trim, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_marker_trim, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df %>%
-      dplyr::left_join(., read_marker_trim, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_marker_trim, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
 
   closeAllConnections()

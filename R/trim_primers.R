@@ -151,7 +151,7 @@ trim_primers <- function(project_path = NULL,
     writexl::write_xlsx(read_count_df, file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df  %>%
-      dplyr::left_join(., read_count_cutadapt, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_cutadapt, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
 }

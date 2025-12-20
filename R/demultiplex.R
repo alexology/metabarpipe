@@ -6,9 +6,9 @@
 #' @param project_path The path to the project folder.
 #' @param r1 Path to the multiplexed r1 file.
 #' @param r2 Path to the multiplexed r2 file.
-#' @param Indices combinations.
-#' @param Indices used.
-#' @param Output folder.
+#' @param combinations Indices combinations.
+#' @param indices Indices used.
+#' @param folder Output folder.
 #'
 #' @export
 #'

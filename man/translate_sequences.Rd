@@ -8,7 +8,8 @@ translate_sequences(
   project_path = NULL,
   m = NULL,
   M = NULL,
-  genetic_code = NULL
+  genetic_code = NULL,
+  check_reverse = FALSE
 )
 }
 \arguments{
@@ -18,7 +19,9 @@ translate_sequences(
 
 \item{M}{Maximum marker length}
 
-\item{genetic_code}{Gentic code for sequences translation. See}
+\item{genetic_code}{Genetic code for sequences translation.}
+
+\item{check_reverse}{Also check reverse-complement reading frames? Default to \code{FALSE}}
 }
 \description{
 This function select sequences that do not have a stop codon.

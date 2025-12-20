@@ -20,6 +20,8 @@ filter_by_quality(
 
 \item{vsearch_path}{The path to \code{vsearch} folder.}
 
+\item{output_path}{The path were saving the results.}
+
 \item{max_ee}{From \code{vsearch}: "...discard sequences with more than the specified number of expected errors"}
 
 \item{qmax}{From \code{vsearch}: "...the maximum quality score accepted when reading FASTQ files. Default to 41."}

@@ -18,8 +18,7 @@
 #' `create_project()`try to do this for input raw files, that must be fastq.
 #'
 #' @export
-#'
-#' @importFrom dplyr select slice pull
+
 
 file_rename <-  function(project_path = NULL,
                          metadata = NULL,
@@ -29,64 +28,42 @@ file_rename <-  function(project_path = NULL,
                          r1_new = "_r1.fastq",
                          r2_new = "_r2.fastq"){
 
-  if(is.null(metadata)){
-    # get r1 file list
-    r1_files_list <- list.files(file.path(project_path, "1_demultiplexed"),
-                                pattern = r1_original,
-                                full.names = TRUE)
+  # set up the folder
+  folder <- if (is.null(file_folder)) "1_demultiplexed" else file_folder
+  folder_path <- file.path(project_path, folder)
 
-    # get r2 file list
-    r2_files_list <- list.files(file.path(project_path, "1_demultiplexed"),
-                                pattern = r2_original,
-                                full.names = TRUE)
+  if (is.null(metadata)) {
 
-    # change the pattern of r1
-    r1_file_new <- gsub(r1_original, r1_new, r1_files_list)
-
-    # change the pattern of r2
-    r2_file_new <- gsub(r2_original, r2_new, r2_files_list)
-
-    # rename r1
-    file.rename(from = r1_files_list, to = r1_file_new)
-
-    # rename r2
-    file.rename(from = r2_files_list, to = r2_file_new)
-
-
-  } else {
-    # get file list
-    files_list <- list.files(file.path(project_path, file_folder),
-                             full.names = TRUE)
-
-    # copy the old file list to generate the new one
-    files_list_new <- files_list
-
-    for(i in 1:nrow(metadata)){
-
-      # get the old name
-      old_name <-  metadata %>%
-        dplyr::select(fastq) %>%
-        dplyr::slice(i) %>%
-        dplyr::pull()
-
-
-      # get new name
-      new_name <-  metadata %>%
-        dplyr::select(fastq_new) %>%
-        dplyr::slice(i) %>%
-        dplyr::pull()
-
-
-      # change the names
-      files_list_new <- gsub(old_name, new_name, files_list_new)
-
+    if (is.null(r1_original) || is.null(r2_original)) {
+      stop("When metadata is NULL, r1_original and r2_original must be provided.")
     }
 
-    file.rename(from = files_list, to = files_list_new)
+    r1_files_list <- list.files(folder_path, pattern = r1_original, full.names = TRUE)
+    r2_files_list <- list.files(folder_path, pattern = r2_original, full.names = TRUE)
+
+    r1_file_new <- gsub(r1_original, r1_new, r1_files_list)
+    r2_file_new <- gsub(r2_original, r2_new, r2_files_list)
+
+    ok1 <- file.rename(from = r1_files_list, to = r1_file_new)
+    ok2 <- file.rename(from = r2_files_list, to = r2_file_new)
+
+    if (any(!ok1) || any(!ok2)) warning("Some files could not be renamed.")
+    invisible(NULL)
+
+  } else {
+
+    files_list <- list.files(folder_path, full.names = TRUE)
+    files_list_new <- files_list
+
+    for (i in seq_len(nrow(metadata))) {
+      old_name <- metadata %>% dplyr::slice(i) %>% dplyr::pull("fastq")
+      new_name <- metadata %>% dplyr::slice(i) %>% dplyr::pull("fastq_new")
+      files_list_new <- gsub(old_name, new_name, files_list_new)
+    }
+
+    ok <- file.rename(from = files_list, to = files_list_new)
+    if (any(!ok)) warning("Some files could not be renamed.")
     message("done")
+    invisible(NULL)
   }
-
-
-
-
 }

@@ -48,7 +48,7 @@ paired_end_merge <- function(project_path = NULL,
                            r1_pattern = "_r1_trimmed.fastq",
                            r2_pattern = "_r2_trimmed.fastq",
                            return_fastq_names = TRUE) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
 
 
@@ -154,12 +154,12 @@ paired_end_merge <- function(project_path = NULL,
     # remove columns with dplyr
     read_count_df %>%
       dplyr::select(-dplyr::any_of(col_to_remove)) %>%
-      dplyr::left_join(., read_count_merged, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_merged, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df %>%
-      dplyr::left_join(., read_count_merged, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_merged, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
   
 }

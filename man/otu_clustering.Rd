@@ -5,14 +5,17 @@
 \title{OTU clustering with vsearch}
 \usage{
 otu_clustering(
-  asv_table = NULL,
+  asv_folder = "13_taxonomic_assignment",
+  project_path = NULL,
   vsearch_path = NULL,
   id = 0.97,
   vsearch_arguments = NULL
 )
 }
 \arguments{
-\item{asv_table}{ASV table.}
+\item{asv_folder}{Path to the folder with ASV results.}
+
+\item{project_path}{Path to the project folder.}
 
 \item{vsearch_path}{Path to vsearch.}
 

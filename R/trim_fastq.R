@@ -71,7 +71,7 @@ trim_fastq_length <- function(project_path = NULL,
                            file_folder = "1_demultiplexed",
                            return_fastq_names = TRUE,
                            n_reads = n_reads) %>%
-    paste(., collapse = "|")
+    paste(collapse = "|")
 
 
   # select r1 files with grepl
@@ -141,16 +141,21 @@ trim_fastq_length <- function(project_path = NULL,
     # get the IDs without the last part for r1
     id_r1_temp <- names(subset_r1) %>%
       as.character() %>%
-      strsplit(., " ") %>%
-      do.call(rbind, .) %>%
+      strsplit(" ")
+    
+    # to avoid RCMD checks
+    id_r1_temp <- do.call(rbind, id_r1_temp) %>%
       as.data.frame() %>%
       dplyr::select(1)
+    
 
     # get the IDs without the last part for r2
     id_r2_temp <- names(subset_r2)  %>%
       as.character() %>%
-      strsplit(., " ") %>%
-      do.call(rbind, .) %>%
+      strsplit(" ")
+    
+    # to avoid RCMD checks
+    id_r2_temp <-  do.call(rbind, id_r2_temp) %>%
       as.data.frame() %>%
       dplyr::select(1)
 
@@ -160,25 +165,6 @@ trim_fastq_length <- function(project_path = NULL,
     if( (! all(id_r1_temp == id_r2_temp)) | (r1_read_count != r2_read_count)){
       message("some mess with IDs")
       closeAllConnections()
-#
-#       cmd_r1 <- paste("--fastx_filter ",
-#                       r1_path[i],
-#                       " --reverse ", r2_path[i],
-#                       " --fastq_stripleft ", left_r1,
-#                       " --fastq_stripright ", right_r1,
-#                       if(!is.null(trim_r1)){paste(" --fastq_trunclen ", trim_r1, sep = "")},
-#                       # if(is.null(min_length_r1)){paste(" --fastq_minlen ", min_length_r1, sep = "")},
-#                       if(!is.null(vsearch_arguments_r1)){paste(" ", vsearch_arguments_r1, " ", sep = "")},
-#                       " --fastqout ",
-#                       r1_new_path[i],
-#                       " --fastqout_rev ",
-#                       r2_new_path[i],
-#                       sep="")
-#
-#
-#       # run vsearch for r1
-#       s2_r1 <- system2(vsearch_path,
-#                        cmd_r1)
 
       file_fwd <- r1_new_path[i]
       file_rvr <- r2_new_path[i]
@@ -218,8 +204,10 @@ trim_fastq_length <- function(project_path = NULL,
       # get the IDs without the last part for r1
       id_r1_temp <- names(subset_r1) %>%
         as.character() %>%
-        strsplit(., " ") %>%
-        do.call(rbind, .) %>%
+        strsplit(" ")
+      
+      # to avoid RCMD checks
+      id_r1_temp <- do.call(rbind, id_r1_temp) %>%
         as.data.frame() %>%
         dplyr::select(1) %>%
         dplyr::pull(1)
@@ -227,8 +215,10 @@ trim_fastq_length <- function(project_path = NULL,
       # get the IDs without the last part for r2
       id_r2_temp <- names(subset_r2)  %>%
         as.character() %>%
-        strsplit(., " ") %>%
-        do.call(rbind, .) %>%
+        strsplit(" ")
+      
+      # to avoid RCMD checks
+      id_r2_temp <- do.call(rbind, id_r2_temp) %>%
         as.data.frame() %>%
         dplyr::select(1) %>%
         dplyr::pull(1)
@@ -277,8 +267,8 @@ trim_fastq_length <- function(project_path = NULL,
     writexl::write_xlsx(read_count_df, file.path(project_path, "log_files", "0_read_count.xlsx"))
   } else{
     read_count_df  %>%
-      dplyr::left_join(., read_count_trimmed, by = "samples_name") %>%
-      writexl::write_xlsx(., file.path(project_path, "log_files", "0_read_count.xlsx"))
+      dplyr::left_join(read_count_trimmed, by = "samples_name") %>%
+      writexl::write_xlsx(file.path(project_path, "log_files", "0_read_count.xlsx"))
   }
 
   closeAllConnections()
