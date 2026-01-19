@@ -133,9 +133,11 @@ otu_clustering <- function(asv_folder = "13_taxonomic_assignment",
     dplyr::select(-c("ASV_id")) %>%
     dplyr::inner_join(otu_id_vsearch_hits, by = "vsearch_id") %>%
     dplyr::select(-c("vsearch_id")) %>%
-    dplyr::relocate("OTU") %>%
-    dplyr::arrange("OTU")
-
+    dplyr::relocate("OTU") 
+  
+  # sort by OTU, not sure arrange is working
+  asv_table_vsearch_def <- asv_table_vsearch_def[order(asv_table_vsearch_def$OTU, decreasing = FALSE), ]
+  
   # get the basename
   file_name <-  strsplit(basename(file_list), "\\.") %>%
     unlist()

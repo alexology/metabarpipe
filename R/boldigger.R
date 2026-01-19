@@ -25,14 +25,24 @@ boldigger <- function(asv_folder = NULL,
   if(is.null(project_path)){
     project_path <- getwd()
   }
+
+  # remove existing folders, if any
+  dirs_to_remove <- list.dirs(file.path(project_path, "13_taxonomic_assignment"),
+                              full.names = TRUE,
+                              recursive = FALSE)
   
-  # remove existing files, otherwise unexpected beahviours
+  # remove directories
+  if(length(dirs_to_remove) > 0){
+    unlink(dirs_to_remove, force = FALSE, recursive = TRUE)
+  }
+
+  # remove existing files, otherwise unexpected behaviors
   file_to_remove <- list.files(file.path(project_path, "13_taxonomic_assignment"),
                                full.names = TRUE)
   
   # remove files if any
   if(length(file_to_remove) > 0){
-    file.remove(file_to_remove)
+    invisible(file.remove(file_to_remove))
   }
   
   # on exit set the working directory on folder path

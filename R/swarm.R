@@ -79,14 +79,20 @@ swarm <- function(asv_folder = "13_taxonomic_assignment",
   path_input <- file.path(out_dir, "asv_swarm.fasta")
 
   # run swarm
-  system2(file.path(swarm_path),
-          args = c("-d", param_d,
-                   "-t", param_t,
-                   if(!is.null(swarm_arguments)) {swarm_arguments},
-                   "-w", path_representative,
-                   path_input,
-                   "-o", path_list))
+  vout <- system2(file.path(swarm_path),
+                  args = c("-d", param_d,
+                           "-t", param_t,
+                           if(!is.null(swarm_arguments)) {swarm_arguments},
+                           "-w", path_representative,
+                           path_input,
+                           "-o", path_list),
+                  stdout = TRUE,
+                  stderr = TRUE)
 
+  if (!file.exists(path_list)) {
+    stop("vsearch did not create: ", path_list,
+         "\n\nvsearch output:\n", paste(vout, collapse = "\n"))
+  }
 
   # leggo i risultati di swarm e assegno ogni ASV alla proprioa OTU
   otu_id_swarm <- read.csv(file.path(out_dir, "cluster_list.txt"), header = FALSE)
